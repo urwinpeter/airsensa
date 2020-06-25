@@ -1,41 +1,38 @@
 package service
 
 import (
-	"log"
+	"database/sql"
+	"net/http"
 	"time"
 
-	"github.com/urwinpeter/airsensa/database"
 	"github.com/urwinpeter/airsensa/storage"
 )
 
-//var end_time time.Time
+type DataService struct {
+	db    *storage.ItemsDB
+	cache *storage.Cache
+}
+
+func NewDataService(dbconn *sql.DB) *DataService {
+	itemsdb := storage.NewItemsDB(dbconn)
+	cache := storage.NewCache()
+	return &DataService{itemsdb, cache}
+}
 
 // Load 10 days of data into cache
-func Load() {
+func (service *DataService) LoadCache(data []storage.Datum) {
+	service.cache.LoadData(data)
+}
+
+func (service *DataService) GetFromCache(w http.ResponseWriter, r *http.Request) {
+	service.cache.GetData(w, r)
+}
+
+func (service *DataService) GetFromDB() []storage.Datum {
 	now := time.Now()
-	rows := database.GetData(
+	items := service.db.GetData(
 		now,
 		now.Add(time.Hour*24*10*-1),
 	)
-
-	var (
-		category string
-		name     string
-		price    float32
-		datetime string
-	)
-
-	for rows.Next() {
-		err := rows.Scan(
-			&category,
-			&name,
-			&price,
-			&datetime,
-		)
-		if err != nil {
-			log.Fatal(err)
-		}
-		storage.Load(category, name, price, datetime)
-	}
-
+	return items
 }

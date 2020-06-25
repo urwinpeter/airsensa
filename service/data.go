@@ -2,7 +2,6 @@ package service
 
 import (
 	"database/sql"
-	"net/http"
 	"time"
 
 	"github.com/urwinpeter/airsensa/storage"
@@ -14,21 +13,20 @@ type DataService struct {
 }
 
 func NewDataService(dbconn *sql.DB) *DataService {
-	itemsdb := storage.NewItemsDB(dbconn)
-	cache := storage.NewCache()
-	return &DataService{itemsdb, cache}
+	return &DataService{
+		storage.NewItemsDB(dbconn),
+		storage.NewCache(0, 0),
+	}
 }
 
-// Load 10 days of data into cache
-func (service *DataService) LoadCache(data []storage.Datum) {
+func (service *DataService) LoadCache(data []byte) {
 	service.cache.LoadData(data)
 }
 
-func (service *DataService) GetFromCache(w http.ResponseWriter, r *http.Request) {
-	service.cache.GetData(w, r)
+func (service *DataService) GetFromCache(key string) (interface{}, bool) {
+	return service.cache.GetData(key)
 }
 
-func (service *DataService) GetFromDB(now, past time.Time) []storage.Datum {
-	items := service.db.GetData(now, past)
-	return items
+func (service *DataService) GetFromDB(now, past time.Time) []byte {
+	return service.db.GetData(now, past)
 }

@@ -6,7 +6,8 @@
 ## - useful commands
 
 ```
-TODO
+curl -X GET -i http://localhost:8080/
+curl -X GET -i http://localhost:8080/Shoes
 ```
 
 ## - TODO

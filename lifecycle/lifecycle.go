@@ -2,12 +2,10 @@ package lifecycle
 
 import (
 	"database/sql"
-	"net/http"
 	"time"
 
 	"github.com/urwinpeter/airsensa/requests"
 	"github.com/urwinpeter/airsensa/service"
-	"github.com/urwinpeter/airsensa/storage"
 )
 
 type lifecycle struct {
@@ -17,7 +15,7 @@ type lifecycle struct {
 
 func NewLifecycle(dbconn *sql.DB) *lifecycle {
 	service := service.NewDataService(dbconn)
-	handler := requests.NewHandler("localhost", "8080")
+	handler := requests.NewHandler("localhost", "8080", service)
 	return &lifecycle{service, handler}
 }
 
@@ -31,14 +29,10 @@ func (lc *lifecycle) Start() {
 	lc.loadRequestHandler()
 }
 
-func (lc *lifecycle) loadCache(data []storage.Datum) {
+func (lc *lifecycle) loadCache(data []byte) {
 	lc.dataservice.LoadCache(data)
 }
 
 func (lc *lifecycle) loadRequestHandler() {
-	lc.handler.LoadHandler(lc.onRequest)
-}
-
-func (lc *lifecycle) onRequest(w http.ResponseWriter, r *http.Request) {
-	lc.dataservice.GetFromCache(w, r)
+	lc.handler.LoadHandler()
 }

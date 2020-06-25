@@ -1,8 +1,8 @@
 package storage
 
 type Datum struct {
-	Category string
-	Name     string
-	price    float32
-	datetime string
+	Category string  `json:"category"`
+	Name     string  `json:"name"`
+	Price    float32 `json:"price"`
+	Datetime string  `json:"datetime"`
 }

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"database/sql"
+	"encoding/json"
 	"log"
 	"time"
 
@@ -16,12 +17,13 @@ func NewItemsDB(dbconn *sql.DB) *ItemsDB {
 	return &ItemsDB{dbconn}
 }
 
-func (data *ItemsDB) GetData(now, past time.Time) []Datum {
+func (data *ItemsDB) GetData(now, past time.Time) []byte {
 	rows, err := data.conn.Query(
 		"SELECT category, name, price, datetime FROM items WHERE datetime BETWEEN ? AND ?",
 		past,
 		now,
 	)
+	defer rows.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,13 +34,18 @@ func (data *ItemsDB) GetData(now, past time.Time) []Datum {
 		err := rows.Scan(
 			&item.Category,
 			&item.Name,
-			&item.price,
-			&item.datetime,
+			&item.Price,
+			&item.Datetime,
 		)
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		items = append(items, item)
 	}
-	return items
+	byte, err := json.Marshal(items)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return byte
 }

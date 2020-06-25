@@ -16,7 +16,7 @@ func NewItemsDB(dbconn *sql.DB) *ItemsDB {
 	return &ItemsDB{dbconn}
 }
 
-func (data *ItemsDB) GetData(now time.Time, past time.Time) []Datum {
+func (data *ItemsDB) GetData(now, past time.Time) []Datum {
 	rows, err := data.conn.Query(
 		"SELECT category, name, price, datetime FROM items WHERE datetime BETWEEN ? AND ?",
 		past,

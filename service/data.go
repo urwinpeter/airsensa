@@ -28,11 +28,7 @@ func (service *DataService) GetFromCache(w http.ResponseWriter, r *http.Request)
 	service.cache.GetData(w, r)
 }
 
-func (service *DataService) GetFromDB() []storage.Datum {
-	now := time.Now()
-	items := service.db.GetData(
-		now,
-		now.Add(time.Hour*24*10*-1),
-	)
+func (service *DataService) GetFromDB(now, past time.Time) []storage.Datum {
+	items := service.db.GetData(now, past)
 	return items
 }

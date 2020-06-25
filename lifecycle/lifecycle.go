@@ -3,6 +3,7 @@ package lifecycle
 import (
 	"database/sql"
 	"net/http"
+	"time"
 
 	"github.com/urwinpeter/airsensa/requests"
 	"github.com/urwinpeter/airsensa/service"
@@ -21,7 +22,11 @@ func NewLifecycle(dbconn *sql.DB) *lifecycle {
 }
 
 func (lc *lifecycle) Start() {
-	data := lc.dataservice.GetFromDB()
+	now := time.Now()
+	data := lc.dataservice.GetFromDB(
+		now,
+		now.Add(time.Hour*24*10*-1),
+	)
 	lc.loadCache(data)
 	lc.loadRequestHandler()
 }

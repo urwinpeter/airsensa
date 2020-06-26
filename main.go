@@ -9,10 +9,10 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("sqlite3", "data.db")
+	db, dbAccessErr := sql.Open("sqlite3", "data.db")
 	defer db.Close()
-	if err != nil {
-		log.Fatal(err)
+	if dbAccessErr != nil {
+		log.Fatal(dbAccessErr)
 	}
 	fmt.Println("Welcome")
 	lc := lifecycle.NewLifecycle(db)

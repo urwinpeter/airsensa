@@ -42,9 +42,9 @@ func (h *Handler) display(key string, w http.ResponseWriter, r *http.Request) {
 func (h *Handler) LoadHandler() {
 	http.HandleFunc("/", h.onRequest)
 	http.HandleFunc("/Shoes", h.onShoesRequest)
-	err := http.ListenAndServe(h.host+":"+h.port, nil)
-	if err != nil {
-		log.Fatal("error starting http server : ", err)
+	httperror := http.ListenAndServe(h.host+":"+h.port, nil)
+	if httperror != nil {
+		log.Fatal("error starting http server : ", httperror)
 		return
 	}
 

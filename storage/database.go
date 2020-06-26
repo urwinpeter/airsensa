@@ -18,30 +18,34 @@ func NewItemsDB(dbconn *sql.DB) *ItemsDB {
 }
 
 func (data *ItemsDB) GetData(now, past time.Time) []byte {
-	rows, err := data.conn.Query(
+	rows, queryError := data.conn.Query(
 		"SELECT category, name, price, datetime FROM items WHERE datetime BETWEEN ? AND ?",
 		past,
 		now,
 	)
 	defer rows.Close()
-	if err != nil {
-		log.Fatal(err)
+	if queryError != nil {
+		log.Fatal(queryError)
 	}
 	var item Datum
 	var items []Datum
 
 	for rows.Next() {
-		err := rows.Scan(
+		scanError := rows.Scan(
 			&item.Category,
 			&item.Name,
 			&item.Price,
 			&item.Datetime,
 		)
-		if err != nil {
-			log.Fatal(err)
+		if scanError != nil {
+			log.Fatal(scanError)
 		}
 
 		items = append(items, item)
+	}
+	rowsError := rows.Err()
+	if rowsError != nil {
+		log.Fatal(rowsError)
 	}
 	byte, err := json.Marshal(items)
 	if err != nil {
